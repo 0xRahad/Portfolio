@@ -1,0 +1,29 @@
+name: Flutter Web CI/CD
+
+on:
+  push:
+    branches: [main] # Change to your main branch name
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x' # Or specify a version
+          channel: 'stable'
+
+      - run: flutter pub get
+
+      - run: flutter build web --release
+
+      # Deploy to GitHub Pages (example)
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch where your web app will be deployed
+          folder: build/web
+          clean: true
