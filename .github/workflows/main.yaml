@@ -25,5 +25,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: main # The branch where your web app will be deployed
+          token: ${{ secrets.TOKEN }}
           folder: build/web
           clean: true
