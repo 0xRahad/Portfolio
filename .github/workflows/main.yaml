@@ -24,6 +24,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages # The branch where your web app will be deployed
+          branch: main # The branch where your web app will be deployed
           folder: build/web
           clean: true
