@@ -9,10 +9,17 @@ class AppTheme {
       drawerTheme: DrawerThemeData(
         backgroundColor: MColor.primaryColor,
       ),
+      listTileTheme: ListTileThemeData(
+          textColor: Colors.white,
+          iconColor: Colors.white),
+      iconTheme: IconThemeData(color: Colors.white),
       appBarTheme: AppBarTheme(
           color: MColor.primaryColor,
           surfaceTintColor: Colors.transparent,
           elevation: 0),
       scaffoldBackgroundColor: MColor.primaryColor,
-      textTheme: GoogleFonts.urbanistTextTheme());
+      textTheme: GoogleFonts.urbanistTextTheme().apply(
+        displayColor: Colors.white,
+        bodyColor: Colors.white,
+      ));
 }

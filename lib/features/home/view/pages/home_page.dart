@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:portfolio/core/route/routes.dart';
 import 'package:portfolio/core/utils/url_launcher.dart';
+import 'package:portfolio/features/common/service/auth_service.dart';
 import 'package:portfolio/features/home/view/pages/about_me_page.dart';
 import 'package:portfolio/features/home/view/pages/projects_page.dart';
+import 'package:smooth_scroll_multiplatform/smooth_scroll_multiplatform.dart';
 
 import '../../../../core/consts/images.dart';
 import '../../../../core/consts/strings.dart';
@@ -67,41 +71,48 @@ class HomePage extends StatelessWidget {
               : SizedBox.shrink()
         ],
       ),
-      body: ListView(
-        physics: AlwaysScrollableScrollPhysics(),
-        children: [
-          Gap(100),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 75.0),
-            child: context.isMobile
-                ? Column(
-              children: [
-                buildHeader(context),
-                const Gap(50),
-                buildImage(context),
-              ],
-            )
-                : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: buildHeader(context),
+      body: DynMouseScroll(
+        builder: (p0, p1, p2) {
+          return ListView(
+            controller: p1,
+            physics: p2,
+            children: [
+              Gap(100),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                child: context.isMobile
+                    ? Column(
+                  children: [
+                    buildHeader(context),
+                    const Gap(50),
+                    buildImage(context),
+                  ],
+                )
+                    : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: buildHeader(context),
+                    ),
+                    const Gap(20),
+                    Expanded(
+                      flex: 1,
+                      child: buildImage(context),
+                    ),
+                  ],
                 ),
-                const Gap(20),
-                Expanded(
-                  flex: 1,
-                  child: buildImage(context),
-                ),
-              ],
-            ),
-          ),
-          Divider(height: 0),
-          Gap(20),
-          AboutMePage(),
-          Gap(20),
-          ProjectsPage(),
-        ],
+              ),
+              Divider(height: 0),
+              Gap(20),
+              AboutMePage(),
+              Gap(20),
+              Divider(height: 0),
+              Gap(20),
+              ProjectsPage(),
+            ],
+          );
+        },
       ),
       drawer: buildDrawer(), // Add the drawer
     );
@@ -151,6 +162,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget buildDrawer() {
+    final authService = Get.find<AuthService>();
     return Drawer(
       child: ListView(
         children: [
@@ -162,11 +174,10 @@ class HomePage extends StatelessWidget {
               Icon(Icons.account_circle, size: 80),
               Text(name,
                   style: TextStyle(
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 18)),
               Text(emailAddress,
-                  style: TextStyle(color: Colors.white, fontSize: 14))
+                  style: TextStyle(fontSize: 14))
             ],
           )),
           ListTile(
@@ -193,6 +204,23 @@ class HomePage extends StatelessWidget {
               UrlLauncher.launch(url: linkedin);
             },
           ),
+          Obx(() {
+            return !authService.isLoggedIn ? ListTile(
+              leading: Icon(LucideIcons.logIn),
+              title: Text("Log in"),
+              subtitle: Text("Log in to your account"),
+              onTap: () {
+                Get.toNamed(Routes.loginPage);
+              },
+            ) : ListTile(
+              title: Text("Logout"),
+              subtitle: Text("Logout from your account"),
+              leading: Icon(LucideIcons.logOut),
+              onTap: () {
+                authService.signOut();
+              },
+            );
+          }),
         ],
       ),
     );
