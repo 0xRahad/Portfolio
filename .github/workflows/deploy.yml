@@ -1,0 +1,52 @@
+name: Deploy Flutter Web to VPS
+
+on:
+  push:
+    branches:
+      - main  # Change this if using a different branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        run: flutter build web --release
+
+      - name: Create ZIP archive
+        run: |
+          cd build/web
+          zip -r web.zip ./*  
+          mv web.zip ../..  # Move zip to project root
+
+      - name: Upload web.zip to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "web.zip"
+          target: "/www/wwwroot/logiculas.me/public-flutter"
+
+      - name: SSH into VPS and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /www/wwwroot/logiculas.me/public-flutter
+            rm -rf *  # Remove old files
+            unzip -o web.zip  # Extract new files
+            rm web.zip  # Remove the zip file
