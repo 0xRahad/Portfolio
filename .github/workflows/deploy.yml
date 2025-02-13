@@ -32,7 +32,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Use your Personal Access Token here
         with:
           tag_name: v1.0.0  # Adjust the tag name as needed
           release_name: Release v1.0.0
@@ -42,7 +42,7 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Use your Personal Access Token here
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build.zip
@@ -54,7 +54,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}  # Use password instead of SSH key
           source: "build.zip"
           target: "/www/wwwroot/logiculas.me/public-flutter/"
 
@@ -63,7 +63,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}  # Use password instead of SSH key
           script: |
             cd /www/wwwroot/logiculas.me/public-flutter/
             unzip -o build.zip -d .
