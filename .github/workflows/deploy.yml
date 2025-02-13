@@ -16,7 +16,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.x' # Or specify a version
+          channel: 'stable'
 
       - name: Install dependencies
         run: flutter pub get
@@ -47,6 +48,6 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /www/wwwroot/logiculas.me/public-flutter
-            rm -rf *  # Remove old files
+            rm -rf web.zip  # Remove old files
             unzip -o web.zip  # Extract new files
             rm web.zip  # Remove the zip file
