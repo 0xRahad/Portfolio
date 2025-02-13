@@ -3,7 +3,8 @@ name: Deploy Flutter Web to VPS
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*'  # Trigger only when pushing a tag starting with "v"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,7 +16,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x' # Or specify a version
+          flutter-version: '3.x' # Specify a Flutter version
           channel: 'stable'
 
       - name: Install dependencies
@@ -27,15 +28,25 @@ jobs:
       - name: Zip build/web files (without directory structure)
         run: |
           cd build/web
-          zip -r ../../build.zip .  # Zip the contents of build/web into build.zip
+          zip -r ../../build.zip .  # Zip only the contents of build/web
 
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Use your Personal Access Token here
+        with:
+          tag_name: ${{ github.ref_name }}  # Use the pushed tag as the release tag
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}  # Use your Personal Access Token here
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}  # Fix missing upload_url
           asset_path: build.zip
           asset_name: build.zip
           asset_content_type: application/zip
