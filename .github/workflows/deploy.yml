@@ -25,30 +25,46 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release
 
-      - name: Create ZIP archive
-        run: |
-          cd build/web
-          zip -r web.zip ./*
-          mv web.zip ../..  # Move zip to project root
+      - name: Zip build files
+        run: zip -r build.zip build/web
 
-      - name: Upload web.zip to VPS
-        uses: appleboy/scp-action@v0.1.4
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.0  # Adjust the tag name as needed
+          release_name: Release v1.0.0
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build.zip
+          asset_name: build.zip
+          asset_content_type: application/zip
+
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}  # Use password for authentication
-          source: "web.zip"
-          target: "/www/wwwroot/logiculas.me/public-flutter"
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "build.zip"
+          target: "/www/wwwroot/logiculas.me/public-flutter/"
 
-      - name: SSH into VPS and deploy
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Unzip and Deploy on VPS
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}  # Use password for authentication
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /www/wwwroot/logiculas.me/public-flutter || exit 1
-            ls -lh  # Check files before deleting
-            rm -rf *  # Remove old files (be careful with this command)
-            unzip -o web.zip  # Extract new files
-            rm web.zip  # Remove the zip file
+            cd /www/wwwroot/logiculas.me/public-flutter/
+            unzip -o build.zip -d .
+            rm build.zip
