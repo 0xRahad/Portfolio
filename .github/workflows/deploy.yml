@@ -53,7 +53,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
+          username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}  # Use password instead of SSH key
           source: "build.zip"
           target: "/www/wwwroot/logiculas.me/public-flutter/"
@@ -62,7 +62,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
+          username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}  # Use password instead of SSH key
           script: |
             cd /www/wwwroot/logiculas.me/public-flutter/
