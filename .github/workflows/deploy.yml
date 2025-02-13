@@ -3,48 +3,52 @@ name: Deploy Flutter Web to VPS
 on:
   push:
     branches:
-      - main  # Change this to your deployment branch
+      - main  # Change this if using a different branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.x"  # Set your Flutter version
+          flutter-version: '3.x' # Or specify a version
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build Flutter Web
-        run: |
-          flutter config --enable-web
-          flutter build web --release
+        run: flutter build web --release
 
-      - name: Upload web.zip to VPS
+      - name: Create ZIP archive
         run: |
           cd build/web
-          zip -r web.zip .  # Create zip from built files
-          scp web.zip ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/www/wwwroot/logiculas.me/public-flutter/
+          zip -r web.zip ./*
+          mv web.zip ../..  # Move zip to project root
 
-      - name: SSH into VPS and Deploy
+      - name: Upload web.zip to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}  # Use password for authentication
+          source: "web.zip"
+          target: "/www/wwwroot/logiculas.me/public-flutter"
+
+      - name: SSH into VPS and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
+          password: ${{ secrets.VPS_PASSWORD }}  # Use password for authentication
           script: |
             cd /www/wwwroot/logiculas.me/public-flutter || exit 1
-            echo "Checking if web.zip exists..."
-            if [ -f "web.zip" ]; then
-              echo "web.zip found, proceeding with deployment."
-              rm -rf assets canvaskit icons *.js *.json *.html *.png  # Delete old files safely
-              unzip -o web.zip
-              rm web.zip
-              echo "Deployment completed successfully."
-            else
-              echo "Error: web.zip not found!"
-              exit 1
-            fi
+            ls -lh  # Check files before deleting
+            rm -rf *  # Remove old files (be careful with this command)
+            unzip -o web.zip  # Extract new files
+            rm web.zip  # Remove the zip file
