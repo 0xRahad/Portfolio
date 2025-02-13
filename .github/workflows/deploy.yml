@@ -25,8 +25,10 @@ jobs:
       - name: Build Flutter Web
         run: flutter build web --release
 
-      - name: Zip build files
-        run: zip -r build.zip build/web
+      - name: Zip build/web files (without directory structure)
+        run: |
+          cd build/web
+          zip -r ../../build.zip .  # Zip the contents of build/web into build.zip
 
       - name: Create Release
         id: create_release
