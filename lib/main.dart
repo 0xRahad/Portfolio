@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      title: "Portfolio - Md Rahadul Islam",
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.themeData,
