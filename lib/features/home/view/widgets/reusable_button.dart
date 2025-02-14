@@ -16,7 +16,9 @@ class ReusableButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(minimumSize: Size(100, 50)),
+      style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.07),
+          minimumSize: Size(100, 50)),
       icon: icon != null ? Icon(icon, color: Colors.white) : SizedBox.shrink(),
       label: Text(label, style: TextStyle(color: Colors.white)),
     );

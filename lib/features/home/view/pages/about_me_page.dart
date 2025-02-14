@@ -1,154 +1,179 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:portfolio/core/consts/strings.dart';
 import 'package:portfolio/core/utils/screen_size.dart';
-
-import '../../../../core/consts/lists.dart';
 
 class AboutMePage extends StatelessWidget {
   const AboutMePage({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: context.isMobile ? 20.0 : 60.0),
+      child: context.isMobile
+          ? Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildSkillList(context),
+          const Gap(40),
+          _buildWorkExperienceList(context),
+        ],
+      )
+          : Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            "Skills",
-            style: TextStyle(fontSize: 20, color: Colors.white60),
-          ),
-          const Gap(20),
-          SizedBox(
-            width: 700,
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              alignment: WrapAlignment.center,
-              children: skillSet
-                  .map((skill) => skillContainer(label: skill))
-                  .toList(),
-            ),
-          ),
-          Gap(20),
-          Divider(height: 0),
-          Gap(20),
-          Text("Work Experience",
-              style: TextStyle(fontSize: 20, color: Colors.white)),
-          Gap(20),
-          WorkExperienceView(experiences: jobExperiences)
+          Expanded(child: _buildWorkExperienceList(context)),
+          const Gap(40),
+          Expanded(child: _buildSkillList(context)),
         ],
       ),
     );
   }
 
-  Widget skillContainer({required String label}) {
-    return ChoiceChip(
-      onSelected: (value) {},
-      selected: false,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-          side: BorderSide(color: Colors.grey)),
-      label: Text(label, style: TextStyle(color: Colors.white)),
-    );
-  }
-}
-
-class WorkExperienceView extends StatelessWidget {
-  final List<Map<String, String>> experiences;
-
-  const WorkExperienceView({super.key, required this.experiences});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50.0),
-      child: context.isDesktop
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: experiences
-                  .map((experience) => Expanded(
-                        child: WorkExperienceCard(
-                          title: experience['title']!,
-                          description: experience['description']!,
-                          duration: experience['duration']!,
-                          location: experience['location']!,
-                        ),
-                      ))
-                  .toList(),
-            )
-          : Column(
-              children: experiences
-                  .map((experience) => WorkExperienceCard(
-                        title: experience['title']!,
-                        description: experience['description']!,
-                        duration: experience['duration']!,
-                        location: experience['location']!,
-                      ))
-                  .toList(),
+  // Build skill list for mobile and desktop
+  Widget _buildSkillList(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            "Technical Skills",
+            style: TextStyle(
+              fontSize: context.isMobile ? 24 : 30,
+              fontWeight: FontWeight.bold,
             ),
-    );
-  }
-}
-
-class WorkExperienceCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String duration;
-  final String location;
-
-  const WorkExperienceCard({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.duration,
-    required this.location,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 600,
-        height: 220,
-        margin: EdgeInsets.only(bottom: 20),
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.withOpacity(0.2))),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                duration,
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              Gap(10),
-              Text(
-                location,
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              )
-            ]),
-            Expanded(
-              child: Text(
-                description,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            ),
-          ],
+            textAlign: TextAlign.center,
+          ),
         ),
+        const Gap(20),
+        ..._buildSkills(context),
+      ],
+    );
+  }
+
+  List<Widget> _buildSkills(BuildContext context) {
+    final skills = [
+      ["Programming Languages", "Kotlin, Java, Dart, Python, JavaScript, PHP, C++"],
+      ["Frameworks", "Jetpack Compose, KMP, Flutter"],
+      ["Backend", "Node.js, Express.js, PHP"],
+      ["Database", "MongoDB, MySQL, Firebase, Supabase, AppWrite, SQLite, Room, Hive"],
+      ["Cloud", "Amazon AWS, DigitalOcean, Microsoft Azure"],
+      ["CI/CD & DevOps", "GitHub Actions, GitLab CI/CD, CircleCI, CodeMagic"],
+    ];
+
+    return skills
+        .map((skill) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: buildSkillSet(title: skill[0], description: skill[1], context: context),
+    ))
+        .toList();
+  }
+
+  Widget _buildWorkExperienceList(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            "Work Experience",
+            style: TextStyle(
+              fontSize: context.isMobile ? 24 : 30,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const Gap(20),
+        ..._buildExperiences(context),
+      ],
+    );
+  }
+
+  List<Widget> _buildExperiences(BuildContext context) {
+    final experiences = [
+      [jobAsianGroup, "Mar 24 - Present", "Livorno, Italy (Remote)", jobAsianGroupSubtitle],
+      [jobUpwork, "Jan 20 - Mar 24", "(Remote)", jobUpworkDesc],
+      [jobFiverr, "Jan 20 - Present", "(Remote)", jobFiverrDesc],
+    ];
+
+    return experiences
+        .map((exp) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: buildJobExperience(
+        title: exp[0],
+        duration: exp[1],
+        location: exp[2],
+        description: exp[3],
+        context: context,
       ),
+    ))
+        .toList();
+  }
+
+  // Reusable skill set widget
+  Widget buildSkillSet({
+    required String title,
+    required String description,
+    required BuildContext context,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.greenAccent,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const Gap(8),
+        Text(
+          description,
+          style: const TextStyle(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  // Reusable job experience widget
+  Widget buildJobExperience({
+    required String title,
+    required String duration,
+    required String location,
+    required String description,
+    required BuildContext context,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.greenAccent,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const Gap(8),
+        Text(
+          "$duration • $location",
+          style: const TextStyle(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+        const Gap(8),
+        Text(
+          description,
+          style: const TextStyle(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

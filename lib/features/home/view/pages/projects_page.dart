@@ -1,65 +1,110 @@
-import 'package:cloudinary_flutter/image/cld_image.dart';
-import 'package:cloudinary_url_gen/transformation/resize/resize.dart';
-import 'package:cloudinary_url_gen/transformation/transformation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:portfolio/core/consts/strings.dart';
+import 'package:portfolio/core/utils/screen_size.dart';
+
+import '../widgets/project_card.dart';
 
 class ProjectsPage extends StatelessWidget {
   const ProjectsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          "Recent Projects",
-          style: TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        Gap(10),
-      ],
+    List<ProjectModel> projects = [
+      ProjectModel(
+        title: "Sposhto-AI App",
+        technologies: ["Kotlin", "Tensorflow light", "MVVM", "ML Model"],
+        description: sposhtoAppDesc,
+        imageUrl:
+            "https://res.cloudinary.com/dgvpyx7at/image/upload/f_auto,q_auto/ygz45opnkri3x1ozoiyk",
+      ),
+      ProjectModel(
+        title: "AGD SIM Activation",
+        technologies: [
+          "Flutter",
+          "Riverpod",
+          "MVVM",
+          "Laravel",
+          "MySQL",
+          "Github"
+        ],
+        description: simAppDesc,
+        imageUrl:
+            "https://res.cloudinary.com/dgvpyx7at/image/upload/f_auto,q_auto/id7yl79mv1ouzoq3ctd6",
+      ),
+      ProjectModel(
+        title: "Asian Group Distributor",
+        technologies: [
+          "Flutter",
+          "Riverpod",
+          "MVVM",
+          "Laravel",
+          "MySQL",
+          "Github"
+        ],
+        description: asianGroupDesc,
+        imageUrl:
+            "https://res.cloudinary.com/dgvpyx7at/image/upload/f_auto,q_auto/eoc67lxbqeouixsurfho",
+      ),
+      ProjectModel(
+        title: "Rio Bottom Navigation Bar",
+        technologies: [
+          "Kotlin",
+          "Jetpack Compose",
+        ],
+        description: rioBottomNavDesc,
+        imageUrl:
+            "https://res.cloudinary.com/dgvpyx7at/image/upload/f_auto,q_auto/ny0voatub1zbpmiv8lq6",
+      ),
+    ];
+
+    return Padding(
+      padding:
+          EdgeInsets.symmetric(horizontal: context.isMobile ? 20.0 : 100.0),
+      child: Column(
+        children: [
+          Center(
+            child: Text(
+              "Recent Projects",
+              style: TextStyle(
+                fontSize: context.isMobile ? 24 : 30,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const Gap(20),
+          Column(
+            children: projects
+                .map((project) => Column(
+                      children: [
+                        ProjectCard(
+                          title: project.title,
+                          description: project.description,
+                          imageUrl: project.imageUrl,
+                          technologies: project.technologies,
+                        ),
+                        const Gap(20),
+                      ],
+                    ))
+                .toList(),
+          )
+        ],
+      ),
     );
   }
 }
 
-class RecentProjectCard extends StatelessWidget {
-  final String imageUrl;
+class ProjectModel {
   final String title;
+  final List<String> technologies;
   final String description;
-  final String usedTechnologies;
+  final String imageUrl;
 
-  const RecentProjectCard({
-    super.key,
-    required this.imageUrl,
-    required this.description,
-    required this.usedTechnologies,
+  ProjectModel({
     required this.title,
+    required this.technologies,
+    required this.description,
+    required this.imageUrl,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 220,
-        width: 600,
-        margin: EdgeInsets.only(bottom: 20),
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.withOpacity(0.2))),
-        child: Row(
-          children: [
-            CldImageWidget(
-                publicId: 'sample.jpg',
-                transformation: Transformation()
-                  ..resize(Resize.crop()
-                    ..width(100)
-                    ..height(150))
-            ),
-        
-          ],
-        ),
-      ),
-    );
-  }
 }
